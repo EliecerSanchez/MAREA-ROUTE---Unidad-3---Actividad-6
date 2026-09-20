@@ -1,0 +1,54 @@
+@startuml
+title Diagrama de Actividad - Flujo de navegacion
+
+start
+:Usuario solicita la ruta;
+:Selecciona origen y destino;
+split
+  :Consultar estado del trafico (TrafficControlCenter);
+  :Leer grafo de la ciudad (NavigationGraph);
+split again
+  :Seleccionar estrategia activa (RoutePlanner);
+split end
+
+partition "Planificacion (Strategy)" {
+  switch (estrategia elegida)
+    case (distancia minima)
+      :Dijkstra - minimiza km;
+    case (tiempo estatico)
+      :Dijkstra - base sin trafico;
+    case (tiempo en vivo)
+      :Dijkstra - pesos con congestion (marea);
+    case (heuristica)
+      :A* - tiempo en vivo + heuristica;
+    case (linea base)
+      :BFS - saltos sin pesos;
+  endswitch
+  :Calcular ruta optima;
+  :Construir objeto Route con metricas;
+}
+
+partition "Adaptacion (Observer + Command)" {
+  while (mientras dure el viaje) is (navegando)
+    if (¿Trafico cambia en un tramo de la ruta?) then (si)
+      :Navigator recibe notificacion;
+      :pending_replan = true;
+      :RerouteCommand (con undo);
+      :Replanificar ruta optimizada;
+    else (no)
+    endif
+  endwhile
+}
+
+partition "Ejecucion de la navegacion (Iterator)" {
+  :Obtener RouteIterator;
+  repeat
+    :Avanzar al siguiente paso (__next__);
+    :Entregar instruccion al conductor;
+  repeat while (¿llego al destino?) is (no) not (si)
+}
+
+:Registrar metricas y resultados;
+stop
+
+@enduml

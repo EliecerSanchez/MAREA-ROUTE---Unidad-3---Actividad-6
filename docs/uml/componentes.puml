@@ -1,0 +1,64 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam monochrome false
+
+title Diagrama de Componentes - MAREA ROUTE
+
+package "Capa de Presentacion" as PRES <<capa>> {
+  [Usuario / Cliente] as USR
+  [CLI Demo\n(main)] as CLI
+}
+
+package "Capa de Aplicacion / Fachada" as APP <<capa>> {
+  [Navigator\n(Facade + Observer)] as NAV
+  [CommandHistory\n(pila de comandos)] as HIST
+}
+
+package "Capa de Logica de Navegacion" as DOM <<capa>> {
+  [Navigator] as NAV2
+  [RoutePlanner\n(contexto Strategy)] as PLANNER
+  [RouteStrategy\n<<interface>>] as STRAT
+  [Dijkstra] as DJK
+  [AEstrella] as AST
+  [TrafficAware] as TAW
+  [BFS\n(linea base)] as BFS
+  [NavigationGraph] as GRAPH
+  [Route / RoadSegment] as ROUTE
+  [Place / PlaceGroup\n(Composite)] as PLACE
+}
+
+package "Infraestructura" as INFRA <<capa>> {
+  [TrafficControlCenter\n(sujeto Observer)] as TRAF
+  [TrafficLogger\n(observador pasivo)] as TLOG
+  [Resultados / Benchmarks] as RES
+}
+
+USR --> CLI : comandos de navegacion
+CLI --> NAV : set_destination() / replanificar()
+NAV --> PLANNER : delega el calculo
+PLANNER ..> STRAT : <<usa>> (Strategy)
+STRAT <|.. DJK
+STRAT <|.. AST
+STRAT <|.. TAW
+STRAT <|.. BFS
+PLANNER --> GRAPH : lee pesos y vecinos
+STRAT ..> GRAPH : consulta
+NAV --> HIST : ejecuta/undo comandos
+HIST ..> NAV : Command.execute() / undo()
+NAV --|> TRAF : <<se suscribe>> (Observer)
+TRAF ..> NAV : notifica cambios de trafico
+TRAF ..> TLOG : notifica cambios de trafico
+NAV ..> ROUTE : construye Route
+GRAPH --> PLACE : contiene
+PLANNER ..> RES : registra metricas
+
+legend right
+  |= Patron        =| == Elemento ==
+  | Strategy       | RoutePlanner / RouteStrategy
+  | Observer       | TrafficControlCenter / Navigator
+  | Command        | CommandHistory / RerouteCommand
+  | Iterator       | RouteIterator
+  | Composite      | Place / PlaceGroup
+endlegend
+
+@enduml

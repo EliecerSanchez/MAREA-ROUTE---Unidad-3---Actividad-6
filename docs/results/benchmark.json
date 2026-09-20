@@ -1,0 +1,105 @@
+{
+  "sin_marea": [
+    {
+      "strategy": "BFS - saltos (linea base)",
+      "od_pairs": 30,
+      "avg_distance_km": 12.85,
+      "avg_time_min": 16.88059090909091,
+      "avg_nodes_expanded": 73.46666666666667,
+      "avg_exec_ms": 0.09393666665952576,
+      "max_exec_ms": 0.14740000005986076
+    },
+    {
+      "strategy": "Dijkstra - minima distancia",
+      "od_pairs": 30,
+      "avg_distance_km": 11.15,
+      "avg_time_min": 15.903428571428572,
+      "avg_nodes_expanded": 67.8,
+      "avg_exec_ms": 0.15578333332086913,
+      "max_exec_ms": 0.2747999997154693
+    },
+    {
+      "strategy": "Dijkstra - tiempo plano (sin trafico)",
+      "od_pairs": 30,
+      "avg_distance_km": 11.15,
+      "avg_time_min": 15.903428571428572,
+      "avg_nodes_expanded": 70.76666666666667,
+      "avg_exec_ms": 0.16375333337540118,
+      "max_exec_ms": 0.271999999313266
+    },
+    {
+      "strategy": "Dijkstra - tiempo en vivo (marea)",
+      "od_pairs": 30,
+      "avg_distance_km": 11.15,
+      "avg_time_min": 15.903428571428572,
+      "avg_nodes_expanded": 70.46666666666667,
+      "avg_exec_ms": 0.18009666673606262,
+      "max_exec_ms": 0.29290000020409934
+    },
+    {
+      "strategy": "A* - tiempo en vivo + heuristica",
+      "od_pairs": 30,
+      "avg_distance_km": 11.15,
+      "avg_time_min": 15.903428571428572,
+      "avg_nodes_expanded": 47.5,
+      "avg_exec_ms": 0.21975333332496425,
+      "max_exec_ms": 0.3572999994503334
+    }
+  ],
+  "con_marea": [
+    {
+      "strategy": "BFS - saltos (linea base)",
+      "od_pairs": 30,
+      "avg_distance_km": 12.85,
+      "avg_time_min": 19.530952038748293,
+      "avg_nodes_expanded": 73.46666666666667,
+      "avg_exec_ms": 0.09279999994760146,
+      "max_exec_ms": 0.14699999974254752
+    },
+    {
+      "strategy": "Dijkstra - minima distancia",
+      "od_pairs": 30,
+      "avg_distance_km": 11.15,
+      "avg_time_min": 18.071394560033628,
+      "avg_nodes_expanded": 67.8,
+      "avg_exec_ms": 0.15590666677477807,
+      "max_exec_ms": 0.26789999992615776
+    },
+    {
+      "strategy": "Dijkstra - tiempo plano (sin trafico)",
+      "od_pairs": 30,
+      "avg_distance_km": 11.15,
+      "avg_time_min": 18.258978745388177,
+      "avg_nodes_expanded": 70.76666666666667,
+      "avg_exec_ms": 0.16516333344043233,
+      "max_exec_ms": 0.26979999984177994
+    },
+    {
+      "strategy": "Dijkstra - tiempo en vivo (marea)",
+      "od_pairs": 30,
+      "avg_distance_km": 11.45,
+      "avg_time_min": 16.941359062033627,
+      "avg_nodes_expanded": 71.53333333333333,
+      "avg_exec_ms": 0.1850999999381505,
+      "max_exec_ms": 0.2974999997604755
+    },
+    {
+      "strategy": "A* - tiempo en vivo + heuristica",
+      "od_pairs": 30,
+      "avg_distance_km": 11.45,
+      "avg_time_min": 16.941359062033627,
+      "avg_nodes_expanded": 48.53333333333333,
+      "avg_exec_ms": 0.22866333320052945,
+      "max_exec_ms": 0.4067999998369487
+    }
+  ],
+  "hallazgos": {
+    "pares_evaluados": 30,
+    "nodos_grafo": 144,
+    "seed_grafo": 20262,
+    "ahorro_marea_min": 1.13,
+    "ahorro_sin_marea_min": 0.0,
+    "reduccion_nodos_astar_pct": 32.2,
+    "mejora_vivo_vs_plano_pct": 7.2
+  }
+}

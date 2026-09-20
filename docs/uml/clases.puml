@@ -1,0 +1,154 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+title Diagrama de Clases - MAREA ROUTE
+
+' ================= STRATEGY =================
+note "Patron Strategy\nContexto + algoritmos intercambiables" as N_STRATEGY
+class RoutePlanner {
+  -_strategy : RouteStrategy
+  + set_strategy(s : RouteStrategy)
+  + plan(graph, start, end) : Route
+}
+abstract class RouteStrategy {
+  + name : str
+  + description : str
+  + {abstract} plan(graph, start, end) : Route
+}
+RoutePlanner o-- "1" RouteStrategy
+
+class ShortestDistanceStrategy {
+}
+class FastestBaseStrategy {
+}
+class FastestLiveStrategy {
+}
+class AStarLiveStrategy {
+}
+class NaiveBeatStrategy {
+}
+
+RouteStrategy <|.. ShortestDistanceStrategy
+RouteStrategy <|.. FastestBaseStrategy
+RouteStrategy <|.. FastestLiveStrategy
+RouteStrategy <|.. AStarLiveStrategy
+RouteStrategy <|.. NaiveBeatStrategy
+
+' ================= DOMAIN =================
+class NavigationGraph {
+  + places : dict
+  + add_place(p : Place)
+  + add_road(a, b, km, min)
+  + neighbors(node) : list
+  + segment(a, b) : RoadSegment
+}
+class Place {
+  + place_id : str
+  + name : str
+  + category : str
+  + x : float
+  + y : float
+}
+class RoadSegment {
+  + source : str
+  + target : str
+  + distance_km : float
+  + base_minutes : float
+  + congestion : float
+  + current_minutes() : float
+}
+class Route {
+  + start : str
+  + end : str
+  + legs : list
+  + strategy_name : str
+  + total_distance_km() : float
+  + total_time_min() : float
+}
+NavigationGraph o-- "0..*" Place : contiene
+NavigationGraph o-- "0..*" RoadSegment : arcos
+Route o-- "0..*" RoadSegment : legs
+ShortestDistanceStrategy ..> Route
+FastestLiveStrategy ..> NavigationGraph
+
+' ================= COMPOSITE =================
+note "Patron Composite\nhijos de tipo Place o PlaceGroup" as N_COMP
+class PlaceGroup {
+  + name : str
+  + add(child)
+  + leaves() : iterator
+}
+PlaceGroup o-- "0..*" PlaceGroup : children
+PlaceGroup o-- "0..*" Place : hojas
+
+' ================= ITERATOR =================
+note "Patron Iterator\nrecorre pasos de una ruta" as N_ITER
+class RouteIterator {
+  + __next__() : RouteStep
+  + all_steps() : list
+}
+class RouteStep {
+  + index : int
+  + origin : str
+  + destination : str
+  + segment : RoadSegment
+  + describe() : str
+}
+Route ..> RouteIterator : crea
+RouteIterator o-- "0..*" RouteStep
+
+' ================= OBSERVER =================
+note "Patron Observer\nsujeto + observadores" as N_OBS
+class TrafficControlCenter {
+  + attach(o : Observer)
+  + detach(o : Observer)
+  + set_congestion(a, b, valor)
+  + simulate_marea(volume)
+}
+abstract class Observer {
+  + {abstract} update(subject, event, payload)
+}
+class TrafficLogger {
+  + messages : list
+}
+TrafficControlCenter o-- "0..*" Observer
+Observer <|.. TrafficLogger
+
+' ================= COMMAND =================
+note "Patron Command\nacciones con undo" as N_CMD
+interface Command {
+  + label : str
+  + execute()
+  + undo()
+}
+class ChangeDestinationCommand {
+}
+class RerouteCommand {
+}
+class CommandHistory {
+  + execute(c : Command)
+  + undo() : Command
+}
+Command <|.. ChangeDestinationCommand
+Command <|.. RerouteCommand
+CommandHistory o-- "0..*" Command
+
+' ================= FACADE =================
+class Navigator {
+  + planner : RoutePlanner
+  + traffic : TrafficControlCenter
+  + position : str
+  + destination : str
+  + route : Route
+  + pending_replan : boolean
+  + set_destination(start, end) : Route
+  + reroute(strategy) : Route
+  + steps() : RouteIterator
+}
+Navigator *-- RoutePlanner
+Navigator ..> CommandHistory
+Navigator ..> TrafficControlCenter
+Navigator ..> RouteIterator
+
+@enduml

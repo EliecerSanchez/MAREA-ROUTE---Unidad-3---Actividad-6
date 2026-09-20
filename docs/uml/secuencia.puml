@@ -1,0 +1,46 @@
+@startuml
+title Diagrama de Secuencia - Navegacion con replanificacion
+
+actor "Usuario / Conductor" as U
+participant ":Navigator" as NAV
+participant ":RoutePlanner" as PLAN
+participant ":FastestLive\n:Strategy" as STRAT
+participant ":NavigationGraph" as G
+participant ":TrafficControl\n:Center" as TC
+
+== Solicitud de ruta ==
+U -> NAV : set_destination(origen, destino)
+NAV -> PLAN : plan(origen, destino)
+PLAN -> STRAT : plan()   (estrategia activa en contexto)
+STRAT -> G : neighbors(node) / peso del tramo (tiempo en vivo)
+G --> STRAT : RoadSegment / pesos actualizados
+STRAT --> PLAN : Route (camino minimo)
+PLAN --> NAV : Route
+NAV --> U : ruta calculada (km, min estimados)
+
+== Cambio dinamico del trafico (Observer) ==
+TC -> TC : simulate_marea() / set_congestion()
+TC -> NAV : update(event="congestion", payload)
+NAV -> NAV : verifica si la ruta activa pasa por el tramo
+NAV -> NAV : pending_replan = true
+
+alt tramo congestionado forma parte de la ruta activa
+    U -> NAV : replanificar()
+    NAV -> PLAN : plan() (misma estrategia en vivo)
+    PLAN -> STRAT : plan()
+    STRAT -> G : consulta tráfico actualizado
+    G --> STRAT : nuevos pesos
+    STRAT --> PLAN : Route reevaluada
+    PLAN --> NAV : Route optimizada
+    NAV --> U : nueva ruta (con ahorro de tiempo)
+end
+
+== Navegacion paso a paso (Iterator) ==
+U -> NAV : steps()
+NAV --> U : RouteIterator
+loop por cada paso
+    U -> NAV : __next__()
+    NAV --> U : RouteStep (continue hacia siguiente destino)
+end
+
+@enduml

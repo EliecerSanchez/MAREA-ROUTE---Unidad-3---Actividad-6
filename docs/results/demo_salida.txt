@@ -1,0 +1,73 @@
+==============================================================================
+  MAREA ROUTE - Sistema de navegacion inteligente (U3 - Actividad 6)
+==============================================================================
+
+[1] CIUDAD CARGADA: 16 lugares, 31 tramos de via
++------------+------------------------+------------+
+|     id     |         Lugar          | Categoria  |
++------------+------------------------+------------+
+| UNAB       | Universidad            | educacion  |
+| Terminal   | Terminal de Transporte | transporte |
+| Mercado    | Mercado Principal      | comercio   |
+| Biblioteca | Biblioteca Publica     | cultura    |
+| Parque     | Parque Principal       | recreacion |
+| Hospital   | Hospital Central       | salud      |
+| Cacique    | CC Cacique             | comercio   |
+| CentroC    | CC Centro Ciudad       | comercio   |
+| Museo      | Museo del Oro          | cultura    |
+| ZonaG      | Zona Gastronomica      | ocio       |
+| PlazaCC    | CC Plaza               | comercio   |
+| UIS        | Universidad Industrial | educacion  |
+| Estadio    | Estadio Municipal      | deporte    |
+| Aeropuerto | Aeropuerto             | transporte |
+| ZonaR      | Zona Rosa              | ocio       |
+| Alcaldia   | Alcaldia Municipal     | gobierno   |
++------------+------------------------+------------+
+
+[2] PATRON COMPOSITE: agrupacion de destinos
+    Grupo 'Zona de entregas Norte' con 2 destinos hijos.
+    Iterator interno -> recorre los destinos del grupo:
+      1. Universidad (educacion)
+      2. Universidad Industrial (educacion)
+
+[3] PATRON OBSERVER: se activa la 'marea' de trafico en el centro
+    [TrafficLogger] Estado de trafico reiniciado a 0.05.
+    [TrafficLogger] Subio congestion en UNAB-Terminal: 0.08
+    [TrafficLogger] Subio congestion en Terminal-Cacique: 0.76
+    [TrafficLogger] Subio congestion en Terminal-Hospital: 0.34
+    [TrafficLogger] Subio congestion en Terminal-Mercado: 0.73
+    [TrafficLogger] Subio congestion en Mercado-Parque: 0.77
+    [TrafficLogger] Subio congestion en Mercado-Biblioteca: 0.83
+    [TrafficLogger] Subio congestion en Biblioteca-Cacique: 0.30
+
+[4] PATRON STRATEGY: comparacion de estrategias UNAB -> Estadio
++---------------------------------------+-------+-----------+-----------+-------+------+
+|               Estrategia              |   km  | min plano | min marea | nodos |  ms  |
++---------------------------------------+-------+-----------+-----------+-------+------+
+| BFS - saltos (linea base)             | 15.46 | 16.87     | 17.52     | 11    | 0.03 |
+| Dijkstra - minima distancia           | 10.03 | 21.87     | 29.74     | 15    | 0.03 |
+| Dijkstra - tiempo plano (sin trafico) | 11.25 | 13.65     | 19.78     | 11    | 0.02 |
+| Dijkstra - tiempo en vivo (marea)     | 15.46 | 16.87     | 17.52     | 11    | 0.02 |
+| A* - tiempo en vivo + heuristica      | 15.46 | 16.87     | 17.52     | 10    | 0.03 |
++---------------------------------------+-------+-----------+-----------+-------+------+
+
+    La estrategia en vivo ahorra 12.22 min vs. la de minima distancia (17.52 vs 29.74) con 15.46 km.
+
+[5] RUTA ACTIVA (FastestLive): 15.46 km, 17.52 min.
+
+[6] PATRON OBSERVER: sube la congestion sobre un tramo de la ruta actual
+    [Navigator] Cambio de trafico detectado en UNAB-UIS (congestion=0.60).
+    [Navigator] ALERTA: la ruta actual pasa por un tramo congestionado (UNAB-UIS). Se recomienda replanificar.
+
+[7] PATRON COMMAND: replanificacion con soporte de undo
+    (1) RerouteCommand -> nueva ruta: 19.78 min, 11.25 km
+
+[8] PATRON ITERATOR: navegacion paso a paso de la ruta replanificada
+    Paso 1: continua 2.76 km (~3.25 min) hacia Terminal
+    Paso 2: continua 5.68 km (~13.33 min) hacia Cacique
+    Paso 3: continua 2.80 km (~3.19 min) hacia Estadio
+
+[9] COMMAND + UNDO: otros comandos del historial
+    (2) ChangeDestinationCommand -> destino ahora: Aeropuerto
+    (1) undo -> destino vuelto a: Estadio
+    (0) undo -> ruta replanificada revertida a: Dijkstra - tiempo en vivo (marea)
